@@ -50,7 +50,7 @@ func StartServer(port int16) {
 
 		// 7. 返回确认响应
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("请求已接收并打印"))
+		w.Write(rawRequest.Bytes())
 	})
 
 	// 启动 HTTP 服务器

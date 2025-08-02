@@ -15,8 +15,8 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Name:      "server",
-				Usage:     "启动HTTP服务",
-				UsageText: "启动HTTP服务并打印完整的HTTP报文",
+				Usage:     "启动Echo HTTP服务",
+				UsageText: "启动一个HTTP服务 此服务打印并返回完整的HTTP报文",
 				Aliases:   []string{"s"},
 				Flags: []cli.Flag{
 					&cli.Int16Flag{
@@ -53,6 +53,28 @@ func main() {
 					cmd.DoCurl(url)
 					return nil
 				},
+			},
+			{
+				Name: "dns",
+				Usage: "执行DNS解析",
+				UsageText: "执行DNS解析",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name: "url",
+						Aliases: []string{"u"},
+						Usage: "待解析的URL",
+						Required: true,
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					url := c.String("url")
+					if url == "" {
+						return errors.New("url is empty")
+					}
+
+					cmd.DoDNS(url)
+					return nil
+				},				
 			},
 		},
 		Authors: []any{"LiZeC"},
