@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-
 func DoDNS(rawURL string) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
@@ -24,6 +23,8 @@ func DoDNS(rawURL string) {
 		for _, mx := range mxRecords {
 			fmt.Printf("Host: %s, Pref: %d\n", mx.Host, mx.Pref)
 		}
+	} else {
+		fmt.Printf("\nError : %v\n", err)
 	}
 
 	// 获取TXT记录
@@ -33,6 +34,8 @@ func DoDNS(rawURL string) {
 		for _, txt := range txtRecords {
 			fmt.Println(txt)
 		}
+	} else {
+		fmt.Printf("\nError : %v\n", err)
 	}
 
 	// 获取NS记录
@@ -42,14 +45,18 @@ func DoDNS(rawURL string) {
 		for _, ns := range nsRecords {
 			fmt.Println(ns.Host)
 		}
+	} else {
+		fmt.Printf("\nError : %v\n", err)
 	}
 
-		// 获取IP地址
+	// 获取IP地址
 	ips, err := net.LookupIP(host)
 	if err == nil {
 		fmt.Printf("\nIP记录:\n")
 		for _, ip := range ips {
 			fmt.Println(ip)
 		}
+	} else {
+		fmt.Printf("\nError : %v\n", err)
 	}
 }
