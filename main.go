@@ -20,10 +20,10 @@ func main() {
 				Aliases:   []string{"s"},
 				Flags: []cli.Flag{
 					&cli.Int16Flag{
-						Name:    "port",
-						Aliases: []string{"p"},
-						Usage:   "监听端口",
-						Value:   8080,
+						Name:     "port",
+						Aliases:  []string{"p"},
+						Usage:    "监听端口",
+						Value:    8080,
 						Required: false,
 					},
 				},
@@ -33,14 +33,14 @@ func main() {
 				},
 			},
 			{
-				Name: "curl",
-				Usage: "发送HTTP请求",
+				Name:      "curl",
+				Usage:     "发送HTTP请求",
 				UsageText: "发送HTTP请求",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
-						Name: "url",
-						Aliases: []string{"u"},
-						Usage: "待探测的URL",
+						Name:     "url",
+						Aliases:  []string{"u"},
+						Usage:    "待探测的URL",
 						Required: true,
 					},
 				},
@@ -55,14 +55,14 @@ func main() {
 				},
 			},
 			{
-				Name: "dns",
-				Usage: "执行DNS解析",
+				Name:      "dns",
+				Usage:     "执行DNS解析",
 				UsageText: "执行DNS解析",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
-						Name: "url",
-						Aliases: []string{"u"},
-						Usage: "待解析的URL",
+						Name:     "url",
+						Aliases:  []string{"u"},
+						Usage:    "待解析的URL",
 						Required: true,
 					},
 				},
@@ -74,13 +74,44 @@ func main() {
 
 					cmd.DoDNS(url)
 					return nil
-				},				
+				},
+			},
+			{
+				Name:      "tcping",
+				Usage:     "TCP端口探测",
+				UsageText: "探测指定的目标能否建立TCP链接",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "host",
+						Aliases:  []string{"h"},
+						Usage:    "目标主机",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:     "port",
+						Aliases:  []string{"p"},
+						Usage:    "目标端口",
+						Required: true,
+					},
+					&cli.IntFlag{
+						Name:     "timeout",
+						Aliases:  []string{"t"},
+						Usage:    "最大超时时间",
+						Value:    1,
+						Required: false,
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					host := c.String("host")
+					port := c.String("port")
+					timeout := c.Int("timeout")
+					cmd.Tcping(host, port, timeout)
+					return nil
+				},
 			},
 		},
 		Authors: []any{"LiZeC"},
 	}
-
-
 
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
