@@ -12,6 +12,7 @@ import (
 
 func main() {
 	cmd := &cli.Command{
+		Usage: "GO语言实现的HTTP实用工具",
 		Commands: []*cli.Command{
 			{
 				Name:      "server",
