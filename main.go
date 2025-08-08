@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"io"
 	"log"
 	"os"
 
@@ -111,14 +112,56 @@ func main() {
 				},
 			},
 			{
-				Name: "uuid",
-				Usage: "生成UUID",
+				Name:      "uuid",
+				Usage:     "生成UUID",
 				UsageText: "生成一个随机UUID",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					return cmd.UUID()
 				},
 			},
+			{
+				Name:      "json",
+				Usage:     "校验并格式化JSON",
+				UsageText: "校验并格式化JSON, Windows平台输入Ctrl+Z Linux平台输入Ctrl+D 表示EOF",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:     "compress",
+						Aliases:  []string{"c"},
+						Usage:    "压缩JSON",
+						Required: false,
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					compress := c.Bool("compress")
+					content, err := io.ReadAll(os.Stdin)
+					if err != nil {
+						return err
+					}
+					rawJSON := string(content)
+					hasReplace := false
+					for {
+						rawJSON, hasReplace = cmd.Unescape(rawJSON)
+						if !hasReplace {
+							break
+						}
+					}
+
+					ok := cmd.Validate(rawJSON)
+					if !ok {
+						return nil
+					}
+
+					if compress {
+						cmd.CompressJSON(rawJSON)
+					} else {
+						cmd.FormatJSON(rawJSON)
+					}
+
+					return nil
+				},
+			},
 		},
+
 		Authors: []any{"LiZeC"},
 	}
 
