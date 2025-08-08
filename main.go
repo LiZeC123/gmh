@@ -110,6 +110,14 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name: "uuid",
+				Usage: "生成UUID",
+				UsageText: "生成一个随机UUID",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					return cmd.UUID()
+				},
+			},
 		},
 		Authors: []any{"LiZeC"},
 	}
