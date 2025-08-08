@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func DoCurl(url string) {
+func DoCurl(url string) error {
 	req, _ := http.NewRequest("GET", url, nil)
 
 	// 覆盖默认标识，添加浏览器特征头
@@ -18,10 +18,11 @@ func DoCurl(url string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
 	fmt.Println(string(body))
+	return nil
 }

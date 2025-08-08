@@ -11,135 +11,124 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const defaultPort = 8080
+const defaultTimeout = 1
+
 func main() {
 	cmd := &cli.Command{
-		Usage: "GO语言实现的HTTP实用工具",
+		Usage: "All-in-one HTTP utility toolkit",
 		Commands: []*cli.Command{
 			{
-				Name:      "server",
-				Usage:     "启动Echo HTTP服务",
-				UsageText: "启动一个HTTP服务 此服务打印并返回完整的HTTP报文",
-				Aliases:   []string{"s"},
+				Name:    "server",
+				Usage:   "Start an HTTP echo server",
+				Aliases: []string{"s"},
 				Flags: []cli.Flag{
-					&cli.Int16Flag{
+					&cli.Uint16Flag{
 						Name:     "port",
 						Aliases:  []string{"p"},
-						Usage:    "监听端口",
-						Value:    8080,
+						Value:    defaultPort,
 						Required: false,
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					cmd.StartServer(c.Int16("port"))
-					return nil
+					return cmd.StartServer(c.Uint16("port"))
 				},
 			},
 			{
-				Name:      "curl",
-				Usage:     "发送HTTP请求",
-				UsageText: "发送HTTP请求",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:     "url",
-						Aliases:  []string{"u"},
-						Usage:    "待探测的URL",
-						Required: true,
+				Name:  "curl",
+				Usage: "Send an HTTP request",
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name: "url",
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					url := c.String("url")
+					url := c.StringArg("url")
 					if url == "" {
-						return errors.New("url is empty")
+						return errors.New("url cannot be empty")
 					}
 
-					cmd.DoCurl(url)
-					return nil
+					return cmd.DoCurl(url)
 				},
 			},
 			{
-				Name:      "dns",
-				Usage:     "执行DNS解析",
-				UsageText: "执行DNS解析",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:     "url",
-						Aliases:  []string{"u"},
-						Usage:    "待解析的URL",
-						Required: true,
+				Name:  "dns",
+				Usage: "Perform DNS lookup",
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name: "url",
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					url := c.String("url")
+					url := c.StringArg("url")
 					if url == "" {
-						return errors.New("url is empty")
+						return errors.New("url cannot be empty")
 					}
 
-					cmd.DoDNS(url)
-					return nil
+					return cmd.DoDNS(url)
 				},
 			},
 			{
-				Name:      "tcping",
-				Usage:     "TCP端口探测",
-				UsageText: "探测指定的目标能否建立TCP链接",
+				Name:  "tcping",
+				Usage: "Probe TCP port connectivity",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "host",
 						Aliases:  []string{"h"},
-						Usage:    "目标主机",
 						Required: true,
 					},
-					&cli.StringFlag{
+					&cli.Uint16Flag{
 						Name:     "port",
 						Aliases:  []string{"p"},
-						Usage:    "目标端口",
 						Required: true,
 					},
-					&cli.IntFlag{
+					&cli.Uint8Flag{
 						Name:     "timeout",
 						Aliases:  []string{"t"},
-						Usage:    "最大超时时间",
-						Value:    1,
+						Value:    defaultTimeout,
 						Required: false,
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					host := c.String("host")
-					port := c.String("port")
-					timeout := c.Int("timeout")
-					cmd.Tcping(host, port, timeout)
-					return nil
+					port := c.Uint16("port")
+					timeout := c.Uint8("timeout")
+
+					return cmd.Tcping(host, port, timeout)
 				},
 			},
 			{
-				Name:      "uuid",
-				Usage:     "生成UUID",
-				UsageText: "生成一个随机UUID",
+				Name:  "uuid",
+				Usage: "Generate a UUID",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					return cmd.UUID()
 				},
 			},
 			{
 				Name:      "json",
-				Usage:     "校验并格式化JSON",
-				UsageText: "校验并格式化JSON, Windows平台输入Ctrl+Z Linux平台输入Ctrl+D 表示EOF",
+				Usage:     "Validate and format JSON",
+				UsageText: "End input: Ctrl+Z (Windows) or Ctrl+D (Linux)",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:     "compress",
 						Aliases:  []string{"c"},
-						Usage:    "压缩JSON",
 						Required: false,
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					compress := c.Bool("compress")
+
 					content, err := io.ReadAll(os.Stdin)
 					if err != nil {
 						return err
 					}
+					if len(content) == 0 {
+						return errors.New("empty JSON input")
+					}
+
 					rawJSON := string(content)
 					hasReplace := false
-					for {
+					maxIterations := 10
+					for range maxIterations {
 						rawJSON, hasReplace = cmd.Unescape(rawJSON)
 						if !hasReplace {
 							break
@@ -151,13 +140,12 @@ func main() {
 						return nil
 					}
 
+					compress := c.Bool("compress")
 					if compress {
-						cmd.CompressJSON(rawJSON)
+						return cmd.CompressJSON(rawJSON)
 					} else {
-						cmd.FormatJSON(rawJSON)
+						return cmd.FormatJSON(rawJSON)
 					}
-
-					return nil
 				},
 			},
 		},

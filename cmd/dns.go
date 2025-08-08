@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net"
 	"net/url"
-	"os"
 )
 
-func DoDNS(rawURL string) {
+func DoDNS(rawURL string) error {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		fmt.Printf("URL解析错误: %v\n", err)
-		os.Exit(1)
+		return err
 	}
 
 	host := u.Hostname()
@@ -59,4 +58,6 @@ func DoDNS(rawURL string) {
 	} else {
 		fmt.Printf("\nError : %v\n", err)
 	}
+
+	return nil
 }

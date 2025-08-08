@@ -11,7 +11,7 @@ import (
 
 
 
-func StartServer(port int16) {
+func StartServer(port uint16) error {
 	// 设置服务器监听地址和端口
 	addr := fmt.Sprintf(":%d", port)
 	fmt.Printf("HTTP 报文打印服务器正在监听 %s...\n", addr)
@@ -54,5 +54,5 @@ func StartServer(port int16) {
 	})
 
 	// 启动 HTTP 服务器
-	log.Fatal(http.ListenAndServe(addr, nil))
+	return http.ListenAndServe(addr, nil) 
 }
