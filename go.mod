@@ -1,4 +1,4 @@
-module github.com/LiZeC123/go-my-http
+module github.com/LiZeC123/gmh
 
 go 1.24.2
 

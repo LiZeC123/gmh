@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/LiZeC123/go-my-http/cmd"
+	"github.com/LiZeC123/gmh/cmd"
 	"github.com/urfave/cli/v3"
 )
 

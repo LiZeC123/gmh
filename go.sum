@@ -1,3 +1,5 @@
+github.com/LiZeC123/go-my-http v0.0.0-20250808151705-44efbf78bcbc h1:c9VZBswz25xIVYXhD5UpyP5cje18IeG3S1a4SZX+oxo=
+github.com/LiZeC123/go-my-http v0.0.0-20250808151705-44efbf78bcbc/go.mod h1:dL6Nw4Rk+xqOn8o61tX4gLaar3xpIu45kJdTUAdbvOY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
