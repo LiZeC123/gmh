@@ -148,6 +148,30 @@ func main() {
 					}
 				},
 			},
+			{
+				Name:  "mem",
+				Usage: "Perform a memory stability test",
+				Flags: []cli.Flag{
+					&cli.UintFlag{
+						Name:     "maxMemory",
+						Aliases:  []string{"m"},
+						Usage:    "Maximum memory to allocate in gigabytes (GB)",
+						Required: true,
+					},
+					&cli.UintFlag{
+						Name:     "loopCount",
+						Aliases:  []string{"c"},
+						Usage:    "Number of test iterations",
+						Required: true,
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					maxMemory := c.Uint("maxMemory")
+					loopCount := c.Uint("loopCount")
+
+					return cmd.MemCheck(maxMemory, loopCount)
+				},
+			},
 		},
 
 		Authors: []any{"LiZeC"},
