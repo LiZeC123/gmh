@@ -71,12 +71,14 @@ func main() {
 			{
 				Name:  "tcping",
 				Usage: "Probe TCP port connectivity",
-				Flags: []cli.Flag{
-					&cli.StringFlag{
-						Name:     "host",
-						Aliases:  []string{"h"},
-						Required: true,
+				Arguments: []cli.Argument{
+					&cli.StringArgs{
+						Name: "host",
+						Min: 1,
+						Max: -1,
 					},
+				},
+				Flags: []cli.Flag{
 					&cli.Uint16Flag{
 						Name:     "port",
 						Aliases:  []string{"p"},
@@ -90,11 +92,20 @@ func main() {
 					},
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
-					host := c.String("host")
+					hosts := c.StringArgs("host")
+					
 					port := c.Uint16("port")
 					timeout := c.Uint8("timeout")
 
-					return cmd.Tcping(host, port, timeout)
+					for _, host := range hosts {
+						err := cmd.Tcping(host, port, timeout)
+						if err != nil {
+							return err
+						}
+						
+					}
+
+					return nil
 				},
 			},
 			{

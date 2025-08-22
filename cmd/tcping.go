@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-
-
 func Tcping(host string, port uint16, timeout uint8) error {
 	target := net.JoinHostPort(host, strconv.Itoa(int(port)))
 
@@ -25,7 +23,7 @@ func Tcping(host string, port uint16, timeout uint8) error {
 	}
 	fmt.Printf("Ping statistics for %v\n", target)
 	fmt.Printf("\t %v probes sent.\n", total)
-	fmt.Printf("\t %v successful, %v failed.  (%v%% fail)\n", total-fail, fail, float32(fail*100)/float32(total))
+	fmt.Printf("\t %v successful, %v failed.  (%v%% fail)\n\n", total-fail, fail, float32(fail*100)/float32(total))
 
 	return nil
 }
