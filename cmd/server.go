@@ -2,14 +2,35 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/urfave/cli/v3"
 )
 
+const defaultPort = 8080
 
+func ServerCommand() *cli.Command {
+	return &cli.Command{
+		Name:    "server",
+		Usage:   "Start an HTTP echo server",
+		Aliases: []string{"s"},
+		Flags: []cli.Flag{
+			&cli.Uint16Flag{
+				Name:     "port",
+				Aliases:  []string{"p"},
+				Value:    defaultPort,
+				Required: false,
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+			return StartServer(c.Uint16("port"))
+		},
+	}
+}
 
 func StartServer(port uint16) error {
 	// 设置服务器监听地址和端口
@@ -54,5 +75,5 @@ func StartServer(port uint16) error {
 	})
 
 	// 启动 HTTP 服务器
-	return http.ListenAndServe(addr, nil) 
+	return http.ListenAndServe(addr, nil)
 }

@@ -1,17 +1,65 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/urfave/cli/v3"
 )
+
+const defaultTimeout = 1
+
+func TcpingCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "tcping",
+		Usage: "Probe TCP port connectivity",
+		Arguments: []cli.Argument{
+			&cli.StringArgs{
+				Name: "host",
+				Min:  1,
+				Max:  -1,
+			},
+		},
+		Flags: []cli.Flag{
+			&cli.Uint16Flag{
+				Name:     "port",
+				Aliases:  []string{"p"},
+				Required: true,
+			},
+			&cli.Uint8Flag{
+				Name:     "timeout",
+				Aliases:  []string{"t"},
+				Value:    defaultTimeout,
+				Required: false,
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+			hosts := c.StringArgs("host")
+
+			port := c.Uint16("port")
+			timeout := c.Uint8("timeout")
+
+			for _, host := range hosts {
+				err := Tcping(host, port, timeout)
+				if err != nil {
+					return err
+				}
+
+			}
+
+			return nil
+		},
+	}
+}
 
 func Tcping(host string, port uint16, timeout uint8) error {
 	target := net.JoinHostPort(host, strconv.Itoa(int(port)))
 
 	total, fail := 0, 0
-	for i := 0; i < 4; i++ {
+	for range 4 {
 		rst, err := doOneConnect(target, time.Duration(timeout)*time.Second)
 		if err != nil {
 			fmt.Printf("Probing %v - No response - time=%v (err=%v)\n", target, rst, err)

@@ -1,11 +1,154 @@
 package cmd
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sync"
 	"time"
+
+	"github.com/LiZeC123/gmh/util"
+	"github.com/urfave/cli/v3"
 )
+
+func CurlCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "curl",
+		Usage: "Send HTTP requests to one or multiple URLs",
+		Arguments: []cli.Argument{
+			&cli.StringArgs{
+				Name: "url",
+				Min:  0,
+				Max:  -1,
+			},
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "input",
+				Aliases:  []string{"i"},
+				Required: false,
+				Usage:    "Input file containing URLs (one per line). Use '-' for stdin",
+			},
+			&cli.BoolFlag{
+				Name:     "url-only",
+				Aliases:  []string{"u"},
+				Required: false,
+				Usage:    "Output only URLs instead of full HTTP responses",
+			},
+			&cli.StringFlag{
+				Name:     "filter",
+				Aliases:  []string{"f"},
+				Value:    "all",
+				Required: false,
+				Usage:    "Filter output: (a)ll, (s)uccess, or (f)ailure",
+			},
+			&cli.StringFlag{
+				Name:     "output",
+				Aliases:  []string{"o"},
+				Required: false,
+				Usage:    "Write results to the specified file",
+			},
+			&cli.BoolFlag{
+				Name:     "progress",
+				Aliases:  []string{"p"},
+				Required: false,
+				Usage:    "Show progress bar when processing multiple URLs",
+			},
+			&cli.Uint16Flag{
+				Name:    "concurrency",
+				Aliases: []string{"c"},
+				Value:   200,
+				Usage:   "Maximum number of concurrent requests",
+			},
+			&cli.Uint8Flag{
+				Name:    "timeout",
+				Aliases: []string{"t"},
+				Value:   10,
+				Usage:   "Timeout in seconds for each request",
+			},
+			&cli.Uint8Flag{
+				Name:    "retry",
+				Aliases: []string{"r"},
+				Value:   0,
+				Usage:   "Number of times to retry failed requests",
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+			// 准备输入
+			urls, err := util.GetAllInput(c, "url", "input")
+			if err != nil {
+				return err
+			}
+			if len(urls) == 0 {
+				return fmt.Errorf("no URLs provided. Use command arguments, --file, or stdin")
+			}
+
+			// 准备输出
+			outputFile := c.String("output")
+			var writer io.Writer = os.Stdout
+			if outputFile != "" {
+				f, err := os.Create(outputFile)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				writer = f
+			}
+			showProgress := c.Bool("progress") && outputFile != ""
+
+			filter := c.String("filter")
+			switch filter {
+			case "a", "all":
+				filter = "all"
+			case "s", "success":
+				filter = "success"
+			case "f", "failure":
+				filter = "failure"
+			default:
+				return fmt.Errorf("invalid filter value: %s. Use (a)ll, (s)uccess, or (f)ailure", filter)
+			}
+
+			task := Task{
+				Urls:        urls,
+				Concurrency: c.Uint16("concurrency"),
+				Timeout:     c.Uint8("timeout"),
+				Retry:       c.Uint8("retry"),
+				UrlOnly:     c.Bool("url-only"),
+			}
+
+			out := DoCurlTask(task)
+			total := len(task.Urls)
+			count := 0
+			succCount := 0
+			failCount := 0
+			for rst := range out {
+				count++
+				if rst.Err == nil {
+					succCount++
+					if filter == "success" {
+						fmt.Fprintln(writer, rst.Data)
+					}
+				} else {
+					failCount++
+					if filter == "failure" {
+						fmt.Fprintln(writer, rst.Data)
+					}
+				}
+
+				if filter == "all" {
+					fmt.Fprintln(writer, rst.Data)
+				}
+
+				if showProgress {
+					fmt.Printf("Total %d Done %d (%.2f%%): Succ: %d Fail: %d (%.2f%%)\n", total, count, 100*float32(count)/float32(total), succCount, failCount, float32(succCount)/float32(total))
+				}
+			}
+			return nil
+		},
+	}
+}
 
 func DoCurl(url string, timeout uint8, retry uint8) (body string, err error) {
 	req, _ := http.NewRequest("GET", url, nil)

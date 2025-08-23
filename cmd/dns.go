@@ -1,10 +1,34 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/url"
+
+	"github.com/urfave/cli/v3"
 )
+
+func DNSCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "dns",
+		Usage: "Perform DNS lookup",
+		Arguments: []cli.Argument{
+			&cli.StringArg{
+				Name: "url",
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+			url := c.StringArg("url")
+			if url == "" {
+				return errors.New("url cannot be empty")
+			}
+
+			return DoDNS(url)
+		},
+	}
+}
 
 func DoDNS(rawURL string) error {
 	u, err := url.Parse(rawURL)

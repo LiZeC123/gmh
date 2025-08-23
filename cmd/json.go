@@ -2,10 +2,63 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"os"
 	"strings"
+
+	"github.com/urfave/cli/v3"
 )
+
+func JsonCommand() *cli.Command {
+	return &cli.Command{
+		Name:      "json",
+		Usage:     "Validate and format JSON",
+		UsageText: "End input: Ctrl+Z (Windows) or Ctrl+D (Linux)",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:     "compress",
+				Aliases:  []string{"c"},
+				Required: false,
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+
+			content, err := io.ReadAll(os.Stdin)
+			if err != nil {
+				return err
+			}
+			if len(content) == 0 {
+				return errors.New("empty JSON input")
+			}
+
+			rawJSON := string(content)
+			hasReplace := false
+			maxIterations := 10
+			for range maxIterations {
+				rawJSON, hasReplace = Unescape(rawJSON)
+				if !hasReplace {
+					break
+				}
+			}
+
+			ok := Validate(rawJSON)
+			if !ok {
+				return nil
+			}
+
+			compress := c.Bool("compress")
+			if compress {
+				return CompressJSON(rawJSON)
+			} else {
+				return FormatJSON(rawJSON)
+			}
+		},
+	}
+}
 
 func Validate(input string) bool {
 	// 首先检查是否是空字符串

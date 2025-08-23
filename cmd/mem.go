@@ -1,12 +1,42 @@
 package cmd
 
 import (
+	"context"
 	"crypto/md5"
 	"crypto/rand"
 	"fmt"
+
+	"github.com/urfave/cli/v3"
 )
 
 const gigabyte = 1 << 30
+
+func MemCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "mem",
+		Usage: "Perform a memory stability test",
+		Flags: []cli.Flag{
+			&cli.UintFlag{
+				Name:     "maxMemory",
+				Aliases:  []string{"m"},
+				Usage:    "Maximum memory to allocate in gigabytes (GB)",
+				Required: true,
+			},
+			&cli.UintFlag{
+				Name:     "loopCount",
+				Aliases:  []string{"c"},
+				Usage:    "Number of test iterations",
+				Required: true,
+			},
+		},
+		Action: func(ctx context.Context, c *cli.Command) error {
+			maxMemory := c.Uint("maxMemory")
+			loopCount := c.Uint("loopCount")
+
+			return MemCheck(maxMemory, loopCount)
+		},
+	}
+}
 
 func MemCheck(memoryCount uint, loopCount uint) error {
 	memory := make([]byte, memoryCount*gigabyte)
