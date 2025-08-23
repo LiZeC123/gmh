@@ -98,6 +98,7 @@ func CurlCommand() *cli.Command {
 			}
 			showProgress := c.Bool("progress") && outputFile != ""
 
+			// 输出参数处理
 			filter := c.String("filter")
 			switch filter {
 			case "a", "all":
@@ -110,6 +111,7 @@ func CurlCommand() *cli.Command {
 				return fmt.Errorf("invalid filter value: %s. Use (a)ll, (s)uccess, or (f)ailure", filter)
 			}
 
+			// 执行并发检测
 			task := Task{
 				Urls:        urls,
 				Concurrency: c.Uint16("concurrency"),
@@ -117,8 +119,9 @@ func CurlCommand() *cli.Command {
 				Retry:       c.Uint8("retry"),
 				UrlOnly:     c.Bool("url-only"),
 			}
-
 			out := DoCurlTask(task)
+
+			// 收集执行结果
 			total := len(task.Urls)
 			count := 0
 			succCount := 0
@@ -199,11 +202,20 @@ func DoCurlTask(task Task) (out chan TaskRst) {
 			wg.Add(1)
 
 			go func(u string) {
-				defer wg.Done()
+				defer func() {
+					<-sem
+					wg.Done()
+				}()
+
 				data, err := DoCurl(url, task.Timeout, task.Retry)
 
 				if task.UrlOnly {
 					data = url
+				}
+
+				// 详细的错误信息输出到标准错误, 可重定向到文件
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Curl %s failed with err: %v\n", url, err)
 				}
 
 				out <- TaskRst{
