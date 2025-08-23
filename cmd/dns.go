@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/url"
+	"strings"
 
 	"github.com/urfave/cli/v3"
 )
@@ -31,6 +32,10 @@ func DNSCommand() *cli.Command {
 }
 
 func DoDNS(rawURL string) error {
+	if !strings.HasPrefix(rawURL, "http") {
+		rawURL = "https://" + rawURL
+	}
+
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		fmt.Printf("URL解析错误: %v\n", err)
@@ -38,6 +43,9 @@ func DoDNS(rawURL string) error {
 	}
 
 	host := u.Hostname()
+	if host == "" {
+		return errors.New("host is empty")
+	}
 
 	// 获取MX记录
 	mxRecords, err := net.LookupMX(host)
