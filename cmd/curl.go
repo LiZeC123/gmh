@@ -168,7 +168,7 @@ type TaskRst struct {
 
 
 func DoCurlTask(task Task) (out chan TaskRst) {
-	out = make(chan TaskRst)
+	out = make(chan TaskRst, 10)
 	sem := make(chan struct{}, task.Concurrency)
 	var wg sync.WaitGroup
 
