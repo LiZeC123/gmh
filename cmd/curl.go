@@ -82,7 +82,7 @@ func CurlCommand() *cli.Command {
 				return err
 			}
 			if len(urls) == 0 {
-				return fmt.Errorf("no URLs provided. Use command arguments, --file, or stdin")
+				return fmt.Errorf("no URLs provided. Use command arguments, --input, or stdin")
 			}
 
 			// 准备输出
