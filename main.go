@@ -20,6 +20,7 @@ func main() {
 			cmd.UUIDCommand(),
 			cmd.JsonCommand(),
 			cmd.MemCommand(),
+			cmd.JoinCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
