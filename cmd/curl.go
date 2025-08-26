@@ -57,6 +57,13 @@ func CurlCommand() *cli.Command {
 				Usage:    "Show progress bar when processing multiple URLs",
 			},
 			&cli.Uint16Flag{
+				Name:     "step",
+				Aliases:  []string{"s"},
+				Required: false,
+				Value:    1,
+				Usage:    "Step for progress bar",
+			},			
+			&cli.Uint16Flag{
 				Name:    "concurrency",
 				Aliases: []string{"c"},
 				Value:   200,
@@ -97,6 +104,7 @@ func CurlCommand() *cli.Command {
 				writer = f
 			}
 			showProgress := c.Bool("progress") && outputFile != ""
+			step := c.Uint16("step")
 
 			// 输出参数处理
 			filter := c.String("filter")
@@ -144,7 +152,7 @@ func CurlCommand() *cli.Command {
 					fmt.Fprintln(writer, rst.Data)
 				}
 
-				if showProgress {
+				if showProgress && count % step == 0 {
 					fmt.Printf("Total %d Done %d (%.2f%%): Succ: %d Fail: %d (%.2f%%)\n", total, count, 100*float32(count)/float32(total), succCount, failCount, float32(succCount)/float32(total))
 				}
 			}
@@ -211,7 +219,10 @@ func DoCurlTask(task Task) (out chan TaskRst) {
 
 
 func DoCurl(url string, timeout uint8, retry uint8) (body string, err error) {
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
 
 	// 覆盖默认标识，添加浏览器特征头
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
