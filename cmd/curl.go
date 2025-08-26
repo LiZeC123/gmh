@@ -104,7 +104,7 @@ func CurlCommand() *cli.Command {
 				writer = f
 			}
 			showProgress := c.Bool("progress") && outputFile != ""
-			step := c.Uint16("step")
+			step := int(c.Uint16("step"))
 
 			// 输出参数处理
 			filter := c.String("filter")
@@ -153,7 +153,7 @@ func CurlCommand() *cli.Command {
 				}
 
 				if showProgress && count % step == 0 {
-					fmt.Printf("Total %d Done %d (%.2f%%): Succ: %d Fail: %d (%.2f%%)\n", total, count, 100*float32(count)/float32(total), succCount, failCount, float32(succCount)/float32(total))
+					fmt.Printf("Total %d Done %d (%.2f%%): Succ: %d Fail: %d (%.2f%%)\n", total, count, 100*float32(count)/float32(total), succCount, failCount, 100*float32(succCount)/float32(total))
 				}
 			}
 			return nil
