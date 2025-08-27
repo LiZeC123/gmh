@@ -21,6 +21,7 @@ func main() {
 			cmd.JsonCommand(),
 			cmd.MemCommand(),
 			cmd.JoinCommand(),
+			cmd.StringCount(),
 		},
 
 		Authors: []any{"LiZeC"},
