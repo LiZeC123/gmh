@@ -22,6 +22,8 @@ func main() {
 			cmd.MemCommand(),
 			cmd.JoinCommand(),
 			cmd.StringCount(),
+			cmd.SplitFileCommand(),
+			cmd.UniqueCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
