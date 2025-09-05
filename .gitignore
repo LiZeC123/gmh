@@ -34,3 +34,6 @@ go.work.sum
 # temp File
 input.txt
 output.txt
+
+# AutoComplete File
+zsh_autocomplete
