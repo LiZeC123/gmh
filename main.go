@@ -12,6 +12,7 @@ import (
 func main() {
 	cmd := &cli.Command{
 		Usage: "All-in-one HTTP utility toolkit",
+		EnableShellCompletion: true,
 		Commands: []*cli.Command{
 			cmd.ServerCommand(),
 			cmd.CurlCommand(),
