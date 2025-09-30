@@ -82,7 +82,7 @@ func doPrint(info []*CounterInfo) error {
 	}
 
 	for _, i := range info {
-		_, err = fmt.Fprintln(w, fmt.Sprintf("%d\t%d\t%d\t%s\t", i.Total, i.EnglishCount, i.NonEnglishCount, i.Name))
+		_, err = fmt.Fprintf(w, "%d\t%d\t%d\t%s\t\n", i.Total, i.EnglishCount, i.NonEnglishCount, i.Name)
 		if err != nil {
 			return err
 		}
