@@ -25,6 +25,7 @@ func main() {
 			cmd.StringCount(),
 			cmd.SplitFileCommand(),
 			cmd.UniqueCommand(),
+			cmd.StringList(),
 		},
 
 		Authors: []any{"LiZeC"},
