@@ -21,11 +21,11 @@ func main() {
 			cmd.UUIDCommand(),
 			cmd.JsonCommand(),
 			cmd.MemCommand(),
-			cmd.JoinCommand(),
 			cmd.StringCount(),
 			cmd.SplitFileCommand(),
 			cmd.UniqueCommand(),
 			cmd.StringList(),
+			cmd.Replace(),
 		},
 
 		Authors: []any{"LiZeC"},
