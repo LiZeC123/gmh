@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/LiZeC123/gmh/util"
 	"os"
 	"text/tabwriter"
 
@@ -22,13 +23,23 @@ func StringCount() *cli.Command {
 		Usage: "Count string length, English and non-English characters",
 		Arguments: []cli.Argument{
 			&cli.StringArgs{
-				Name: "str",
-				Min:  1,
-				Max:  -1,
+				Name:      "str",
+				Min:       0,
+				Max:       -1,
+				UsageText: "Input strings (if omitted, reads from stdin)",
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			inputs := c.StringArgs("str")
+
+			if len(inputs) == 0 {
+				// 读取标准输入
+				lines, err := util.GetFileInput("-")
+				if err != nil {
+					return err
+				}
+				inputs = append(inputs, lines...)
+			}
 
 			countInfos := make([]*CounterInfo, 0, len(inputs))
 			for _, input := range inputs {
