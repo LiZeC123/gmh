@@ -3,9 +3,10 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/LiZeC123/gmh/util"
 	"github.com/urfave/cli/v3"
-	"strings"
 )
 
 func StringList() *cli.Command {
@@ -37,14 +38,9 @@ func StringList() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			inputs := c.StringArgs("str")
-			if len(inputs) == 0 {
-				// 读取标准输入
-				lines, err := util.GetFileInput("-")
-				if err != nil {
-					return err
-				}
-				inputs = append(inputs, lines...)
+			inputs, err := util.GetArgsOrStdinInput(c, "str")
+			if err != nil {
+				return err
 			}
 
 			separator := c.String("separator")

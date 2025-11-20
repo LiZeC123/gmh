@@ -56,3 +56,18 @@ func GetFileInput(filePath string) (lines []string, err error) {
 
 	return
 }
+
+func GetArgsOrStdinInput(c *cli.Command, argsName string) (lines []string, err error) {
+	// 传入命令行参数, 则直接返回命令行参数
+	inputs := c.StringArgs(argsName)
+	if len(inputs) > 0 {
+		return inputs, nil
+	}
+
+	// 否则从读取标准输入
+	lines, err = GetFileInput("-")
+	if err != nil {
+		return []string{}, err
+	}
+	return lines, nil
+}

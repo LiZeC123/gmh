@@ -30,15 +30,9 @@ func StringCount() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			inputs := c.StringArgs("str")
-
-			if len(inputs) == 0 {
-				// 读取标准输入
-				lines, err := util.GetFileInput("-")
-				if err != nil {
-					return err
-				}
-				inputs = append(inputs, lines...)
+			inputs, err := util.GetArgsOrStdinInput(c, "str")
+			if err != nil {
+				return err
 			}
 
 			countInfos := make([]*CounterInfo, 0, len(inputs))
