@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/urfave/cli/v3"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/urfave/cli/v3"
 )
 
 func SplitFileCommand() *cli.Command {

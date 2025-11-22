@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/urfave/cli/v3"
 	"os"
+
+	"github.com/urfave/cli/v3"
 )
 
 func UniqueCommand() *cli.Command {

@@ -21,12 +21,12 @@ func DNSCommand() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			url := c.StringArg("url")
-			if url == "" {
+			u := c.StringArg("url")
+			if u == "" {
 				return errors.New("url cannot be empty")
 			}
 
-			return DoDNS(url)
+			return DoDNS(u)
 		},
 	}
 }

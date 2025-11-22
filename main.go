@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	cmd := &cli.Command{
-		Usage: "All-in-one HTTP utility toolkit",
+	c := &cli.Command{
+		Usage:                 "All-in-one HTTP utility toolkit",
 		EnableShellCompletion: true,
 		Commands: []*cli.Command{
 			cmd.ServerCommand(),
@@ -31,7 +31,7 @@ func main() {
 		Authors: []any{"LiZeC"},
 	}
 
-	if err := cmd.Run(context.Background(), os.Args); err != nil {
+	if err := c.Run(context.Background(), os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
