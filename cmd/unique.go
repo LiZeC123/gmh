@@ -12,27 +12,11 @@ import (
 func UniqueCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "unique",
-		Usage: "Remove duplicates lines from a file",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "input",
-				Aliases:  []string{"i"},
-				Required: true,
-				Usage:    "Input file to split",
-			},
-		},
+		Usage: "Remove duplicates lines from Stdin",
 		Action: func(ctx context.Context, c *cli.Command) error {
-			filePath := c.String("input")
-
-			file, err := os.Open(filePath)
-			if err != nil {
-				return cli.Exit(fmt.Sprintf("Failed to open file: %v", err), 1)
-			}
-			defer file.Close()
-
 			// 使用map记录已出现的行
 			seen := make(map[string]bool)
-			scanner := bufio.NewScanner(file)
+			scanner := bufio.NewScanner(os.Stdin)
 
 			// 逐行扫描文件
 			for scanner.Scan() {

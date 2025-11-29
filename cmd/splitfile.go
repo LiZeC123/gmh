@@ -14,19 +14,13 @@ import (
 func SplitFileCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "spf",
-		Usage: "Split File with given separator",
+		Usage: "Split input from stdin into multiple files by line count",
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "input",
-				Aliases:  []string{"i"},
-				Required: true,
-				Usage:    "Input file to split",
-			},
 			&cli.StringFlag{
 				Name:     "output",
 				Aliases:  []string{"o"},
 				Required: true,
-				Usage:    "Output file prefix",
+				Usage:    "Output file pattern",
 			},
 			&cli.IntFlag{
 				Name:     "line",
@@ -34,39 +28,18 @@ func SplitFileCommand() *cli.Command {
 				Required: true,
 				Usage:    "Number of lines per output file",
 			},
-			&cli.StringFlag{
-				Name:     "prefix",
-				Aliases:  []string{"p"},
-				Required: false,
-				Usage:    "Prefix to add to each line",
-			},
-			&cli.StringFlag{
-				Name:     "suffix",
-				Aliases:  []string{"s"},
-				Required: false,
-				Usage:    "Suffix to add to each line",
-			},
 		},
 		Action: func(ctx context.Context, c *cli.Command) error {
-			inputFile := c.String("input")
 			outputPrefix := c.String("output")
 			line := c.Int("line")
-			linePrefix := c.String("prefix")
-			lineSuffix := c.String("suffix")
 
-			return splitFileByLines(inputFile, outputPrefix, line, linePrefix, lineSuffix)
+			return splitFileByLines(outputPrefix, line)
 		},
 	}
 }
-func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePrefix, lineSuffix string) error {
+func splitFileByLines(outputPrefix string, linesPerFile int) (err error) {
 	// 打开输入文件
-	file, err := os.Open(inputFile)
-	if err != nil {
-		return fmt.Errorf("failed to open input file: %w", err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(os.Stdin)
 	fileCount := 1
 	lineCount := 0
 	var currentFile *os.File
@@ -90,9 +63,8 @@ func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePref
 	for scanner.Scan() {
 		if lineCount%linesPerFile == 0 {
 			// 关闭当前文件（如果存在）
-			if currentFile != nil {
-				currentWriter.Flush()
-				currentFile.Close()
+			if currentWriter != nil && currentFile != nil {
+				flushAndClose(currentWriter, currentFile)
 			}
 
 			// 创建新文件
@@ -107,12 +79,6 @@ func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePref
 
 		// 处理行内容（添加前缀和后缀）
 		lineContent := scanner.Text()
-		if linePrefix != "" {
-			lineContent = linePrefix + lineContent
-		}
-		if lineSuffix != "" {
-			lineContent = lineContent + lineSuffix
-		}
 
 		// 写入行（如果不是第一行，先添加换行符）
 		if lineCount%linesPerFile > 0 {
@@ -122,7 +88,7 @@ func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePref
 			}
 		}
 
-		_, err := currentWriter.WriteString(lineContent)
+		_, err = currentWriter.WriteString(lineContent)
 		if err != nil {
 			return fmt.Errorf("failed to write to output file: %w", err)
 		}
@@ -130,11 +96,8 @@ func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePref
 	}
 
 	// 刷新并关闭最后一个文件
-	if currentWriter != nil {
-		currentWriter.Flush()
-	}
-	if currentFile != nil {
-		currentFile.Close()
+	if currentWriter != nil && currentFile != nil {
+		flushAndClose(currentWriter, currentFile)
 	}
 
 	// 检查扫描错误
@@ -144,4 +107,16 @@ func splitFileByLines(inputFile, outputPrefix string, linesPerFile int, linePref
 
 	fmt.Printf("Split %d lines into %d files\n", lineCount, fileCount-1)
 	return nil
+}
+
+func flushAndClose(w *bufio.Writer, file *os.File) {
+	err := w.Flush()
+	if err != nil {
+		panic(err)
+	}
+
+	err = file.Close()
+	if err != nil {
+		panic(err)
+	}
 }
