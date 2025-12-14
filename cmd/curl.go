@@ -62,7 +62,7 @@ func CurlCommand() *cli.Command {
 				Required: false,
 				Value:    1,
 				Usage:    "Step for progress bar",
-			},			
+			},
 			&cli.Uint16Flag{
 				Name:    "concurrency",
 				Aliases: []string{"c"},
@@ -100,7 +100,7 @@ func CurlCommand() *cli.Command {
 				if err != nil {
 					return err
 				}
-				defer f.Close()
+				defer util.CloseWithLog(f)
 				writer = f
 			}
 			showProgress := c.Bool("progress") && outputFile != ""
@@ -139,20 +139,20 @@ func CurlCommand() *cli.Command {
 				if rst.Err == nil {
 					succCount++
 					if filter == "success" {
-						fmt.Fprintln(writer, rst.Data)
+						util.PrintToFile(writer, "%s\n", rst.Data)
 					}
 				} else {
 					failCount++
 					if filter == "failure" {
-						fmt.Fprintln(writer, rst.Data)
+						util.PrintToFile(writer, "%s\n", rst.Data)
 					}
 				}
 
 				if filter == "all" {
-					fmt.Fprintln(writer, rst.Data)
+					util.PrintToFile(writer, "%s\n", rst.Data)
 				}
 
-				if showProgress && count % step == 0 {
+				if showProgress && count%step == 0 {
 					fmt.Printf("Total %d Done %d (%.2f%%): Succ: %d Fail: %d (%.2f%%)\n", total, count, 100*float32(count)/float32(total), succCount, failCount, 100*float32(succCount)/float32(total))
 				}
 			}
@@ -173,7 +173,6 @@ type TaskRst struct {
 	Data string
 	Err  error
 }
-
 
 func DoCurlTask(task Task) (out chan TaskRst) {
 	out = make(chan TaskRst, 10)
@@ -201,7 +200,7 @@ func DoCurlTask(task Task) (out chan TaskRst) {
 
 				// 详细的错误信息输出到标准错误, 可重定向到文件
 				if err != nil {
-					fmt.Fprintf(os.Stderr, "Curl %s failed with err: %v\n", url, err)
+					util.PrintErrorLog("Curl %s failed with err: %v\n", url, err)
 				}
 
 				out <- TaskRst{
@@ -216,7 +215,6 @@ func DoCurlTask(task Task) (out chan TaskRst) {
 	return out
 
 }
-
 
 func DoCurl(url string, timeout uint8, retry uint8) (body string, err error) {
 	req, err := http.NewRequest("GET", url, nil)
@@ -237,7 +235,7 @@ func DoCurl(url string, timeout uint8, retry uint8) (body string, err error) {
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer util.CloseWithLog(resp.Body)
 
 	bytes, _ := io.ReadAll(resp.Body)
 	return string(bytes), nil

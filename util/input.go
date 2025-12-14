@@ -37,7 +37,7 @@ func GetFileInput(filePath string) (lines []string, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to open file: %w", err)
 		}
-		defer file.Close()
+		defer CloseWithLog(file)
 		reader = file
 	}
 

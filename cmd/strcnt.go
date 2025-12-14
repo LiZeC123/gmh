@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"text/tabwriter"
 
@@ -82,20 +81,14 @@ func truncateSubString(s string, m int) string {
 func doPrint(info []*CounterInfo) error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
 
-	_, err := fmt.Fprintln(w, "Count\tEnglish\tNon-English\tInput-Content\t")
-	if err != nil {
-		return err
-	}
+	util.PrintToFile(w, "Count\tEnglish\tNon-English\tInput-Content\t")
 
 	for _, i := range info {
-		_, err = fmt.Fprintf(w, "%d\t%d\t%d\t%s\t\n", i.Total, i.EnglishCount, i.NonEnglishCount, i.Name)
-		if err != nil {
-			return err
-		}
+		util.PrintToFile(w, "%d\t%d\t%d\t%s\t\n", i.Total, i.EnglishCount, i.NonEnglishCount, i.Name)
 	}
 
 	// 刷新缓冲区，确保输出
-	err = w.Flush()
+	err := w.Flush()
 	if err != nil {
 		return err
 	}

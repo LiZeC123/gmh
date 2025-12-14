@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/LiZeC123/gmh/util"
 	"net"
 	"strconv"
 	"time"
@@ -81,7 +82,7 @@ func doOneConnect(target string, timeout time.Duration) (time.Duration, error) {
 	conn, err := net.DialTimeout("tcp", target, timeout)
 	duration := time.Since(start)
 	if err == nil {
-		conn.Close()
+		util.CloseWithLog(conn)
 	}
 
 	return duration, err
