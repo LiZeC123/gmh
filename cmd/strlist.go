@@ -11,8 +11,9 @@ import (
 
 func StringList() *cli.Command {
 	return &cli.Command{
-		Name:  "strlist",
-		Usage: "Build a string list with specified separator and wrapping characters",
+		Name:        "strlist",
+		Usage:       "Build a string list with specified separator and wrapping characters",
+		Description: "Format the data set with each item in double quotes, separated by commas and line breaks.\ngmh strlist -w \"\\\"\" -s ','$'\\n'  < a.txt > o.txt",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "separator",
