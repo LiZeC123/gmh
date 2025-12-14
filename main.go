@@ -27,6 +27,7 @@ func main() {
 			cmd.StringList(),
 			cmd.Replace(),
 			cmd.CaseCommand(),
+			cmd.RunTestCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
