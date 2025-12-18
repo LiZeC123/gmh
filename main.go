@@ -28,6 +28,7 @@ func main() {
 			cmd.Replace(),
 			cmd.CaseCommand(),
 			cmd.RunTestCommand(),
+			cmd.TimeConvertCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
