@@ -81,7 +81,7 @@ func truncateSubString(s string, m int) string {
 func doPrint(info []*CounterInfo) error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
 
-	util.PrintToFile(w, "Count\tEnglish\tNon-English\tInput-Content\t")
+	util.PrintToFile(w, "Count\tEnglish\tNon-English\tInput-Content\t\n")
 
 	for _, i := range info {
 		util.PrintToFile(w, "%d\t%d\t%d\t%s\t\n", i.Total, i.EnglishCount, i.NonEnglishCount, i.Name)
