@@ -133,9 +133,8 @@ func makeDisplayBranchStatusString(branch string, hasUnmerged bool, aheadCount, 
 		statusText = "🟢 已合入"
 	}
 
-	if strings.HasPrefix(branch, "*") {
-		branch = branch[1:] // 移除*号
-	}
+	// 移除*号
+	branch = strings.TrimPrefix(branch, "*")
 
 	countStr := ""
 	if aheadCount > 0 {
