@@ -29,6 +29,7 @@ func main() {
 			cmd.CaseCommand(),
 			cmd.RunTestCommand(),
 			cmd.TimeConvertCommand(),
+			cmd.MergeCheckCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
