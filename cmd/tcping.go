@@ -11,7 +11,11 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-const defaultTimeout = 1
+// 默认超时时间调整为2秒
+const defaultTimeout = 2
+
+// 默认探测HTTPS的端口
+const defaultTcpingPort = 443
 
 func TcpingCommand() *cli.Command {
 	return &cli.Command{
@@ -28,7 +32,8 @@ func TcpingCommand() *cli.Command {
 			&cli.Uint16Flag{
 				Name:     "port",
 				Aliases:  []string{"p"},
-				Required: true,
+				Value:    defaultTcpingPort,
+				Required: false,
 			},
 			&cli.Uint8Flag{
 				Name:     "timeout",
