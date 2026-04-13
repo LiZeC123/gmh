@@ -30,6 +30,7 @@ func main() {
 			cmd.RunTestCommand(),
 			cmd.TimeConvertCommand(),
 			cmd.MergeCheckCommand(),
+			cmd.Base64Command(),
 		},
 
 		Authors: []any{"LiZeC"},
