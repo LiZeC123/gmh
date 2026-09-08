@@ -31,6 +31,7 @@ func main() {
 			cmd.TimeConvertCommand(),
 			cmd.MergeCheckCommand(),
 			cmd.Base64Command(),
+			cmd.LatencyCommand(),
 		},
 
 		Authors: []any{"LiZeC"},
