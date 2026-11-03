@@ -115,7 +115,7 @@ func ParseTimeOrTimestamp(input string) (string, error) {
 		var err error
 		
 		for _, format := range formats {
-			t, err = time.Parse(format, input)
+			t, err = time.ParseInLocation(format, input, time.Local)
 			if err == nil {
 				break
 			}
