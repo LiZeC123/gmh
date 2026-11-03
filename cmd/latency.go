@@ -71,7 +71,7 @@ func LatencyCommand() *cli.Command {
 					var wg sync.WaitGroup
 					wg.Add(int(concurrency))
 
-					for i := uint8(0); i < concurrency; i++ {
+					for i := range concurrency {
 						go func(idx uint8) {
 							defer wg.Done()
 							cd, rd, err := doRequest(url, client)
